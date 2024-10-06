@@ -1,0 +1,251 @@
+<!-- sections/custom-tabs.liquid -->
+<section class="custom-tabs">
+  <style>
+        /* Add your tabbed CSS, skin colors, and interactivity here */
+        .tabbed {
+          width: 100%;
+          min-width: 320px;
+          margin: 0 auto;
+          border-bottom: 4px solid #000;
+          overflow: hidden;
+          transition: border 250ms ease;
+        }
+
+        section.custom-tabs {
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          border-radius: 15px;
+          padding: 30px;
+        }
+
+        .tabbed ul {
+          margin: 0px;
+          padding: 0px;
+          overflow: hidden;
+          display: flex;
+          flex-wrap: wrap;
+          list-style-type: none;
+        }
+
+    .tabbed ul li {
+        display: block;
+        font-size: 16px;
+        padding: 5px 37px 5px;
+        background-color: #ffffff;
+        margin-right: -9px;
+        z-index: 2;
+        position: relative;
+        cursor: pointer;
+        color: #1c1c1c;
+        transition: all 250ms ease;
+        margin-top: 15px;
+        clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0 100%);
+        font-family: 'Bricolage Grotesque';
+        font-weight: 600;
+    }
+
+        .tab-content {
+          background: #09b86e;
+          color: white;
+          padding: 15px;
+          border-radius: 0px 0px 10px 10px;
+          font-family: 'Inter';
+        }
+
+        .tabbed ul li:hover {
+          background-color: #000000;
+          color: #fffbfb;
+        }
+
+        .tabbed ul li.active {
+          background-color: #09b86e;
+          color: white;
+        }
+
+        .tab-panel {
+          max-height: 0;
+          opacity: 0;
+          overflow: hidden;
+          transition: max-height 0.5s ease, opacity 0.5s ease;
+        }
+
+        .tab-panel.active {
+          max-height: 500px; /* Adjust based on content */
+          opacity: 1;
+          transition: max-height 0.5s ease, opacity 0.5s ease;
+        }
+
+        .switcher-box a.active {
+          background: #000;
+        }
+
+        .tab-content p {
+          padding-left: 20px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+          section.custom-tabs {
+            width: 100%;
+            padding: 20px;
+          }
+          .tabbed ul {
+            justify-content: center;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .tabbed ul li {
+            font-size: 14px;
+            padding: 8px 16px;
+            margin-right: 5px;
+          }
+          .tab-content {
+            padding: 10px;
+          }
+        }
+
+        @media (max-width: 576px) {
+          section.custom-tabs {
+            padding: 15px;
+          }
+          .tabbed ul {
+            display: block;
+            text-align: center;
+          }
+          .tabbed ul li {
+            display: inline-block;
+            margin: 5px 10px;
+            font-size: 14px;
+            padding: 8px 12px;
+            clip-path: none;
+            border-radius: 8px;
+          }
+          .tab-content {
+            padding: 8px;
+          }
+        }
+  </style>
+
+  <div class="tabbed round" id="skinable">
+    <ul>
+      {% for block in section.blocks %}
+        <li data-tab="{{ forloop.index0 }}" class="{% if forloop.first %}active{% endif %}">
+          {{ block.settings.tab_title }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="tab-content">
+    {% for block in section.blocks %}
+      <div class="tab-panel {% if forloop.first %}active{% endif %}" data-content="{{ forloop.index0 }}">
+        {{ block.settings.tab_content }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="config-group">
+    <div class="switcher-box">
+      <a class="skin-turquoise {% if settings.skin == 'turquoise' %}active{% endif %}" skin="skin-turquoise"
+        ><span></span
+      ></a>
+      <a class="skin-emerald {% if settings.skin == 'emerald' %}active{% endif %}" skin="skin-emerald"><span></span></a>
+      <a class="skin-peter-river {% if settings.skin == 'peter-river' %}active{% endif %}" skin="skin-peter-river"
+        ><span></span
+      ></a>
+      <!-- Add more skin options here -->
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var tabs = document.querySelectorAll('.tabbed li');
+      var panels = document.querySelectorAll('.tab-panel');
+      var switchers = document.querySelectorAll('.switcher-box a');
+      var skinable = document.getElementById('skinable');
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener("click", function() {
+          // Remove active class from all tabs and panels
+          tabs.forEach(t => t.classList.remove('active'));
+          panels.forEach(p => p.classList.remove('active'));
+
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          var targetPanel = document.querySelector(`.tab-panel[data-content="${tab.getAttribute('data-tab')}"]`);
+          targetPanel.classList.add('active');
+        });
+      });
+
+      switchers.forEach(function(switcher) {
+        switcher.addEventListener("click", function() {
+          // Remove active class from all switchers
+          switchers.forEach(s => s.classList.remove('active'));
+          this.classList.add('active');
+
+          // Apply skin
+          var skinName = this.getAttribute('skin');
+          skinable.className = 'tabbed round ' + skinName;
+        });
+      });
+    });
+  </script>
+</section>
+
+<!-- Section schema -->
+{% schema %}
+{
+  "name": "Custom Tabs",
+  "settings": [
+    {
+      "type": "select",
+      "id": "skin",
+      "label": "Tab Skin",
+      "options": [
+        {
+          "value": "turquoise",
+          "label": "Turquoise"
+        },
+        {
+          "value": "emerald",
+          "label": "Emerald"
+        },
+        {
+          "value": "peter-river",
+          "label": "Peter River"
+        }
+        // Add more skin options here
+      ],
+      "default": "turquoise"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Tab Title",
+          "default": "Tab Title"
+        },
+        {
+          "type": "richtext",
+          "id": "tab_content",
+          "label": "Tab Content",
+          "default": "<p>This is the tab content. You can format this text using the editor.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Tabs",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
